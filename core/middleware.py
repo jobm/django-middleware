@@ -2,16 +2,17 @@ from django.http import HttpResponse
 
 from pawame.settings import CACHE_URLS
 from django.core.cache import cache
+from django.utils.deprecation import MiddlewareMixin
 
 
-class CacheUrlsMiddleware:
+class CacheUrlsMiddleware(MiddlewareMixin):
+
     def __init__(self, get_response):
         self.get_response = get_response
         # One-time configuration and initialization.
 
-    def __call__(self, request):
+    def process_request(self, request):
         response = self.get_response(request)
-        # print(dir(request))
         request_url = request.path.strip('/')
         for to_cache_url in CACHE_URLS:
             if request_url in to_cache_url[0]:
